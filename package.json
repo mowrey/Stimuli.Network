@@ -1,0 +1,23 @@
+{
+  "name": "stimuli-backend",
+  "version": "1.0.0",
+  "description": "Generates comments for Stimuli Network frontend",
+  "main": "comment_generator_server.js",
+  "scripts": {
+    "start": "node comment_generator_server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "gemini",
+    "ai",
+    "comments"
+  ],
+  "author": "Adrian Mowrey",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.11.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

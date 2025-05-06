@@ -59,19 +59,23 @@ async function generateMultipleComments(postContext) {
     const numberOfComments = Math.floor(Math.random() * (maxComments - minComments + 1)) + minComments;
     console.log(`Generating ${numberOfComments} comments for context starting with: "${postContext.substring(0, 70)}..."`);
 
-    // Construct the prompt for the AI
+    // --- Construct the prompt for the AI ---
+    // ** Example of incorporating suggestions for more constructive/creative comments **
     const prompt = `Based on the following online post snippet: "${postContext}"
 
-Generate exactly ${numberOfComments} distinct, short (10-25 words each), realistic, and relevant comments reacting to the post. Comments should be supportive, curious, or offer a brief related thought. Do not use hashtags. Do not introduce yourself. Do not ask questions.
+Generate exactly ${numberOfComments} distinct, short (10-25 words each), realistic, relevant, **constructive, and creative** comments reacting to the post.
+Comments should aim to be **thought-provoking**, supportive, curious, **offer an insightful perspective,** or provide a brief related thought that **builds upon the post's idea**.
+Do not use hashtags. Do not introduce yourself (e.g., "As an AI..."). Avoid generic questions unless they genuinely add significant value or insight.
 
 Output ONLY a valid JSON array containing exactly ${numberOfComments} strings, where each string is one comment. Example format: ["Comment 1 text.", "Comment 2 text.", ..., "Comment ${numberOfComments} text."]`;
+    // ** End of example prompt modification **
 
     try {
         // Make the API call to Gemini
         const result = await aiModel.generateContent({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
-                temperature: 0.9, // Higher temperature for more varied comments
+                temperature: 0.9, // Keep reasonably high for creativity
                 topP: 0.95,
                 maxOutputTokens: 2048 // Allow enough tokens for the JSON array
             },
@@ -95,26 +99,21 @@ Output ONLY a valid JSON array containing exactly ${numberOfComments} strings, w
                 console.error(`AI Comment Gen Blocked by Prompt Filter: Reason: ${blockReason}`);
                 return { error: `AI response blocked: ${blockReason}` };
             }
-            // Check for other finish reasons (like length limits, etc.)
+            // Check for other finish reasons
             if (candidate?.finishReason && candidate.finishReason !== "STOP" && candidate.finishReason !== "MAX_TOKENS") {
                 console.warn(`AI Comment Gen Stopped Early: Reason: ${candidate.finishReason}`);
-                // We might still have partial content, so continue processing
             }
 
             // Attempt to extract and parse the text content
             if (candidate?.content?.parts?.[0]?.text) {
                 const rawText = candidate.content.parts[0].text.trim();
                 let jsonString = rawText;
-                // console.log("Raw text received from AI:", rawText); // Verbose logging
 
-                // Clean potential Markdown fences (```json ... ```)
+                // Clean potential Markdown fences
                 const jsonRegex = /^\s*```(?:json)?\s*([\s\S]*?)\s*```\s*$/;
                 const match = rawText.match(jsonRegex);
                 if (match && match[1]) {
                     jsonString = match[1].trim();
-                    // console.log("Markdown fences removed. Attempting to parse:", jsonString);
-                } else {
-                    // console.log("No markdown fences detected. Attempting to parse raw text:", jsonString);
                 }
 
                 // Attempt to parse the potentially cleaned JSON string
@@ -153,19 +152,18 @@ Output ONLY a valid JSON array containing exactly ${numberOfComments} strings, w
 console.log("Creating HTTP server...");
 const server = http.createServer(async (req, res) => {
     const requestTimestamp = new Date().toISOString();
-    const logPrefix = `[${requestTimestamp} ${req.method} ${req.url}]`; // Prefix for logs related to this request
+    const logPrefix = `[${requestTimestamp} ${req.method} ${req.url}]`;
     console.log(`\n${logPrefix} Request received.`);
 
     // --- CORS Headers ---
-    // In production, restrict the origin '*' to your actual frontend domain
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS, GET'); // Allow GET for ping
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Consider restricting in production
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS, GET');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     // --- Handle OPTIONS Preflight ---
     if (req.method === 'OPTIONS') {
         console.log(`${logPrefix} Handling OPTIONS preflight.`);
-        res.writeHead(204); // No Content response for preflight
+        res.writeHead(204);
         res.end();
         console.log(`${logPrefix} Responded 204.`);
         return;
@@ -175,21 +173,17 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && req.url === COMMENT_API_ENDPOINT) {
         console.log(`${logPrefix} Handling API request.`);
         let body = '';
-        // Read request body
         req.on('data', chunk => { body += chunk.toString(); });
-        // Handle stream errors
         req.on('error', (err) => {
              console.error(`${logPrefix} Request body stream error:`, err);
-             if (!res.headersSent) { // Avoid errors if response already started
+             if (!res.headersSent) {
                  res.writeHead(400, { 'Content-Type': 'application/json' });
                  res.end(JSON.stringify({ error: 'Error reading request body.' }));
              }
         });
-        // Process request when body is fully received
         req.on('end', async () => {
             console.log(`${logPrefix} Request body received (${body.length} bytes).`);
             try {
-                // Check for empty body
                 if (!body) {
                     console.warn(`${logPrefix} Empty request body.`);
                     res.writeHead(400, {'Content-Type': 'application/json'});
@@ -197,7 +191,6 @@ const server = http.createServer(async (req, res) => {
                     console.log(`${logPrefix} Responded 400 (Empty Body).`);
                     return;
                  }
-                // Parse JSON body
                 let requestData;
                 try {
                     requestData = JSON.parse(body);
@@ -208,7 +201,6 @@ const server = http.createServer(async (req, res) => {
                     console.log(`${logPrefix} Responded 400 (Invalid JSON).`);
                     return;
                 }
-                // Validate context field
                 const postContext = requestData.context;
                 if (!postContext || typeof postContext !== 'string') {
                     console.warn(`${logPrefix} Invalid or missing 'context' in request body:`, requestData);
@@ -218,13 +210,12 @@ const server = http.createServer(async (req, res) => {
                     return;
                 }
 
-                // Generate multiple comments using the AI function
+                // Generate multiple comments
                 const generationResult = await generateMultipleComments(postContext);
 
                 // Handle potential errors from generation
                 if (generationResult.error) {
                     console.error(`${logPrefix} AI generation failed: ${generationResult.error}`);
-                    // Send appropriate status code based on error type
                     const statusCode = (generationResult.error.includes("blocked by safety") || generationResult.error.includes("blocked by Prompt") || generationResult.error.includes("format incorrect")) ? 400 : 500;
                     res.writeHead(statusCode, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ error: `Failed to generate comments: ${generationResult.error}` }));
@@ -236,9 +227,9 @@ const server = http.createServer(async (req, res) => {
                     console.log(`${logPrefix} Responded 200 with ${generationResult.comments?.length || 0} comments.`);
                 }
 
-            } catch (error) { // Catch unexpected errors in the endpoint handler itself
+            } catch (error) { // Catch unexpected errors in the endpoint handler
                 console.error(`${logPrefix} Unexpected error processing API request:`, error);
-                if (!res.headersSent) { // Check if headers were already sent
+                if (!res.headersSent) {
                      res.writeHead(500, { 'Content-Type': 'application/json' });
                      res.end(JSON.stringify({ error: 'Internal server error processing request.' }));
                      console.log(`${logPrefix} Responded 500 (Handler Error).`);
@@ -310,7 +301,7 @@ server.on('error', (error) => {
     if (error.code === 'EADDRINUSE') {
         console.error(`Port ${PORT} is already in use. Is another server running?`);
     }
-    process.exit(1); // Exit if server cannot start
+    process.exit(1); // Exit if server fails to start
 });
 
 // --- Graceful Shutdown Logic ---

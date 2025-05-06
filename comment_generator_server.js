@@ -59,23 +59,23 @@ async function generateMultipleComments(postContext) {
     const numberOfComments = Math.floor(Math.random() * (maxComments - minComments + 1)) + minComments;
     console.log(`Generating ${numberOfComments} comments for context starting with: "${postContext.substring(0, 70)}..."`);
 
-    // --- Construct the prompt for the AI ---
-    // ** Example of incorporating suggestions for more constructive/creative comments **
+    // --- Construct the prompt for the AI (with enhanced diversity instructions) ---
     const prompt = `Based on the following online post snippet: "${postContext}"
 
-Generate exactly ${numberOfComments} distinct, short (10-25 words each), realistic, relevant, **constructive, and creative** comments reacting to the post.
+Generate exactly ${numberOfComments} **highly distinct and varied** comments reacting to the post. Ensure each comment offers a **unique perspective or angle** compared to the others. Comments should be short (10-25 words each), realistic, relevant, constructive, and creative.
 Comments should aim to be **thought-provoking**, supportive, curious, **offer an insightful perspective,** or provide a brief related thought that **builds upon the post's idea**.
+**Crucially, avoid repeating similar phrases or sentence structures across the comments.**
 Do not use hashtags. Do not introduce yourself (e.g., "As an AI..."). Avoid generic questions unless they genuinely add significant value or insight.
 
 Output ONLY a valid JSON array containing exactly ${numberOfComments} strings, where each string is one comment. Example format: ["Comment 1 text.", "Comment 2 text.", ..., "Comment ${numberOfComments} text."]`;
-    // ** End of example prompt modification **
+    // --- End of prompt modification ---
 
     try {
         // Make the API call to Gemini
         const result = await aiModel.generateContent({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
-                temperature: 0.9, // Keep reasonably high for creativity
+                temperature: 0.9, // Keep temperature relatively high for variety
                 topP: 0.95,
                 maxOutputTokens: 2048 // Allow enough tokens for the JSON array
             },
@@ -301,7 +301,7 @@ server.on('error', (error) => {
     if (error.code === 'EADDRINUSE') {
         console.error(`Port ${PORT} is already in use. Is another server running?`);
     }
-    process.exit(1); // Exit if server fails to start
+    process.exit(1); // Exit if server cannot start
 });
 
 // --- Graceful Shutdown Logic ---

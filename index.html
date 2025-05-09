@@ -142,7 +142,6 @@
         .satoshi-main-dashboard-box {
             background-color: #f0f9ff; /* Lightest blue base - sky-50 */
             border-left: 6px solid #0ea5e9; /* Sky blue accent - sky-500 */
-            /* margin-top is removed as it's now part of the donate section flow */
         }
         .satoshi-tx-received { color: #16a34a; /* Green-600 */ }
         .satoshi-tx-sent { color: #dc2626; /* Red-600 */ }
@@ -154,12 +153,12 @@
 
         /* ICON-ONLY COPY BUTTON STYLES */
         .satoshi-address-copy-button {
-            @apply ml-2 p-2 inline-flex items-center justify-center border border-sky-500 text-sky-700 bg-sky-50 hover:bg-sky-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500 rounded-md transition-all duration-150;
-            width: 36px;
-            height: 36px;
+            @apply ml-2 p-1.5 inline-flex items-center justify-center border border-sky-500 text-sky-700 bg-sky-50 hover:bg-sky-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500 rounded-md transition-all duration-150;
+            width: 30px;
+            height: 30px;
         }
         .satoshi-address-copy-button .icon {
-            font-size: 1em;
+            font-size: 0.9em;
         }
         .satoshi-address-copy-button.success {
             @apply bg-green-50 border-green-500 text-green-700 hover:bg-green-100;
@@ -206,7 +205,8 @@
                     <a href="#about" class="text-gray-600 hover:text-blue-700 nav-link">About Us</a>
                     <a href="#impact" class="text-gray-600 hover:text-blue-700 nav-link">Our Vision</a>
                     <a href="#involved" class="text-gray-600 hover:text-blue-700 nav-link">Get Involved</a>
-                    <a href="#donate" class="text-gray-600 hover:text-blue-700 nav-link">Donate</a> <a href="#community" class="text-gray-600 hover:text-blue-700 nav-link">Community</a>
+                    <a href="#donate" class="text-gray-600 hover:text-blue-700 nav-link">Donate</a>
+                    <a href="#community" class="text-gray-600 hover:text-blue-700 nav-link">Community</a>
                     <a href="#footer-contact" class="text-gray-600 hover:text-blue-700 nav-link">Contact</a>
                 </div>
                 <div class="md:hidden">
@@ -220,7 +220,8 @@
                 <a href="#about" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">About Us</a>
                 <a href="#impact" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">Our Vision</a>
                 <a href="#involved" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">Get Involved</a>
-                <a href="#donate" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">Donate</a> <a href="#community" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">Community</a>
+                <a href="#donate" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">Donate</a>
+                <a href="#community" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">Community</a>
                 <a href="#footer-contact" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">Contact</a>
           </div>
      </header>
@@ -231,7 +232,8 @@
                     <h1 id="hero-headline" class="text-lg sm:text-xl md:text-2xl font-medium mb-4 leading-tight"> Unlock Your Potential </h1>
                      <p id="hero-subheadline" class="text-sm md:text-base mb-8 text-blue-100 max-w-3xl mx-auto"> Stimuli Network is an initiative dedicated to helping people reach their goals. Join us in building a supportive community for all in need. </p>
                     <div class="mt-8">
-                         <a href="#donate" class="bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-8 rounded-lg shadow nav-link text-base">Support Us</a> </div>
+                         <a href="#donate" class="bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-8 rounded-lg shadow nav-link text-base">Support Us</a>
+                    </div>
                 </div>
           </section>
 
@@ -239,7 +241,8 @@
 
           <section id="impact" class="py-16 md:py-24 bg-gray-100"> <div class="container mx-auto px-6 text-center"> <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-12">Our Vision</h2> <p class="text-gray-600 mb-12 max-w-2xl mx-auto">As we establish and grow Stimuli Network, our key goals are:</p> <div class="grid md:grid-cols-3 gap-8"> <div class="bg-white p-8 rounded-lg shadow-md flex flex-col"> <div class="text-blue-700 mb-4 text-4xl"> <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> </div> <h3 class="text-xl font-semibold text-gray-700 mb-2">Register as a Nonprofit</h3> <p class="text-gray-600 flex-grow">Formalize our structure to maximize impact and transparency. We are currently seeking funding to complete the registration process and officially launch our mission.</p> </div> <div class="bg-white p-8 rounded-lg shadow-md flex flex-col"> <div class="text-blue-700 mb-4 text-4xl"> <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg> </div> <h3 class="text-xl font-semibold text-gray-700 mb-2">Offer Internships</h3> <p class="text-gray-600 flex-grow">Provide valuable work experience to students by connecting them with partners serving communities across the United States.</p> </div> <div class="bg-white p-8 rounded-lg shadow-md flex flex-col"> <div class="text-blue-700 mb-4 text-4xl"> <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path d="M12 14l9-5-9-5-9 5 9 5z" /><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" /></svg> </div> <h3 class="text-xl font-semibold text-gray-700 mb-2">Build Scholarship Fund</h3> <p class="text-gray-600 flex-grow">Create a dedicated fund to support students who face financial barriers in completing their studies.</p> </div> </div> </div> </section>
 
-            <section id="involved" class="py-16 md:py-24 bg-white"> <div class="container mx-auto px-6 text-center">
+            <section id="involved" class="py-16 md:py-24 bg-white">
+                <div class="container mx-auto px-6 text-center">
                     <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Get Involved</h2>
                     <p class="text-gray-600 mb-12 max-w-2xl mx-auto">
                         There are many ways to contribute to Stimuli Network. Your time, skills, and financial support are all invaluable as we launch this initiative.
@@ -263,7 +266,7 @@
                             <a href="#footer-contact" class="bg-white text-blue-700 border border-blue-700 hover:bg-blue-50 font-medium py-2 px-6 rounded-lg shadow nav-link">Become a Partner</a>
                         </div>
                     </div>
-                    </div>
+                </div>
             </section>
 
             <section id="donate" class="py-16 md:py-24 bg-gray-100">
@@ -277,15 +280,12 @@
 
                     <div id="satoshi-overview-content-wrapper" class="bg-white shadow-2xl rounded-xl p-6 md:p-8 w-full max-w-2xl mx-auto satoshi-main-dashboard-box">
                         <div class="text-center mb-5 pb-5 border-b border-sky-300">
-                            <div class="flex items-center justify-center text-sky-700 mt-1 mb-2 flex-wrap">
-                                <span class="font-mono break-all text-sm" id="satoshi-address-display-js"></span>
+                            <div class="flex items-center justify-center text-sky-700 mt-1 mb-2 py-2 flex-wrap">
+                                <span class="font-mono break-all text-xs md:text-sm" id="satoshi-address-display-js"></span>
                                 <button id="satoshi-address-copy-button" class="satoshi-address-copy-button" title="Copy Address">
                                     <i id="satoshi-copy-icon" class="icon fas fa-copy"></i>
                                 </button>
-                                <button id="satoshi-address-grab-button-alt" style="display: none !important;"></button>
-                                <div id="satoshi-grab-feedback-alt" style="display: none !important;"></div>
                             </div>
-                            <p class="text-xs text-yellow-700 bg-yellow-100 px-2 py-1 rounded inline-block mt-1">Do NOT send any BTC to this address!! This is for demonstration purposes only.</p>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -322,18 +322,14 @@
                                  <p id="satoshi-transaction-display-status" class="text-sm text-gray-500 pt-10 text-center">Loading transaction...</p>
                             </div>
                             <p id="satoshi-slideshow-info" class="text-xs text-gray-500 mt-2 text-center min-h-[16px]">
-                                Displaying transactions from the latest fetched batch. Updates every 5 seconds.
-                            </p>
+                                </p>
                         </div>
                     </div>
-                     <p class="mt-12 text-gray-600 max-w-2xl mx-auto">
-                        For other ways to contribute, such as corporate sponsorships or planned giving, please
-                        <a href="#footer-contact" class="text-blue-700 hover:text-blue-800 nav-link">contact us</a>.
-                    </p>
                 </div>
             </section>
 
-            <section id="community" class="py-16 md:py-24 bg-white"> <div class="container mx-auto px-6">
+            <section id="community" class="py-16 md:py-24 bg-white">
+                  <div class="container mx-auto px-6">
                         <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-12 text-center">Community Updates</h2>
                         <div id="community-posts-container" class="max-w-2xl mx-auto">
                             <p id="posts-loading-message" class="text-center text-gray-500 italic">Generating community posts...</p>
@@ -689,7 +685,6 @@
         // ICON-ONLY COPY BUTTON ELEMENTS
         addressCopyButtonElement: document.getElementById('satoshi-address-copy-button'),
         addressCopyIconElement: document.getElementById('satoshi-copy-icon'),
-        // addressCopyTextElement is removed as per request
 
         // Configuration and State
         SATOSHI_GENESIS_ADDRESS: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
@@ -717,7 +712,11 @@
         // Transaction Slideshow Logic
         displayCurrentTransactionInSlideshow() {
             if (!this.transactionDisplayAreaElement) return; this.transactionDisplayAreaElement.innerHTML = '';
-            if (this.allFetchedTransactions.length === 0) { this.showTransactionDisplayStatusMessage('No transactions found for this address in the current batch.'); if (this.slideshowInfoElement) this.slideshowInfoElement.textContent = 'No transactions in current batch.'; return; }
+            if (this.allFetchedTransactions.length === 0) {
+                this.showTransactionDisplayStatusMessage('No transactions found for this address in the current batch.');
+                if (this.slideshowInfoElement) this.slideshowInfoElement.textContent = 'No transactions in current batch.';
+                return;
+            }
             if (this.currentTransactionIndex < 0 || this.currentTransactionIndex >= this.allFetchedTransactions.length) { this.currentTransactionIndex = 0; }
             const tx = this.allFetchedTransactions[this.currentTransactionIndex]; const txDiv = document.createElement('div'); txDiv.className = 'p-3 rounded-md bg-gray-50 shadow';
             const netAmountSatoshi = tx.result; const amountBTC = this.formatBtcAmount(Math.abs(netAmountSatoshi)); let type = 'Involved'; let typeClass = 'satoshi-tx-neutral';
@@ -727,13 +726,23 @@
                 <div class="mb-1"><span class="font-bold text-md ${typeClass}">${type === 'Sent' ? '-' : ''}${amountBTC} BTC</span></div>
                 <div class="text-xs text-gray-600 truncate">Hash: <a href="https://www.blockchain.com/btc/tx/${tx.hash}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">${tx.hash}</a></div>`;
             this.transactionDisplayAreaElement.appendChild(txDiv);
-            if (this.slideshowInfoElement) { this.slideshowInfoElement.textContent = `Showing transaction ${this.currentTransactionIndex + 1} of ${this.allFetchedTransactions.length}. Updates every 5 seconds.`; }
+
+            // UPDATED slideshow info text
+            if (this.slideshowInfoElement) {
+                this.slideshowInfoElement.textContent = `Showing transaction ${this.currentTransactionIndex + 1} of the last 100 transactions.`;
+            }
         },
         advanceSlideshow() { if (this.allFetchedTransactions.length === 0) return; this.currentTransactionIndex = (this.currentTransactionIndex + 1) % this.allFetchedTransactions.length; this.displayCurrentTransactionInSlideshow(); },
         startTransactionSlideshow() {
             if (this.transactionSlideshowIntervalId) { clearInterval(this.transactionSlideshowIntervalId); }
-            if (this.allFetchedTransactions.length > 0) { this.displayCurrentTransactionInSlideshow(); this.transactionSlideshowIntervalId = setInterval(() => this.advanceSlideshow(), this.SLIDESHOW_INTERVAL_MS); }
-            else { this.showTransactionDisplayStatusMessage('No transactions found for slideshow.'); if(this.slideshowInfoElement) this.slideshowInfoElement.textContent = 'No transactions in current batch, or API error.'; }
+            if (this.allFetchedTransactions.length > 0) {
+                this.displayCurrentTransactionInSlideshow(); // This will set the initial message correctly
+                this.transactionSlideshowIntervalId = setInterval(() => this.advanceSlideshow(), this.SLIDESHOW_INTERVAL_MS);
+            }
+            else {
+                this.showTransactionDisplayStatusMessage('No transactions found for slideshow.');
+                if(this.slideshowInfoElement) this.slideshowInfoElement.textContent = 'No transactions in current batch, or API error.';
+            }
         },
 
         // Data Fetching Methods

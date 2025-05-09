@@ -740,8 +740,8 @@
                 this.transactionSlideshowIntervalId = setInterval(() => this.advanceSlideshow(), this.SLIDESHOW_INTERVAL_MS);
             }
             else {
-                this.showTransactionDisplayStatusMessage('No transactions found for slideshow.');
-                if(this.slideshowInfoElement) this.slideshowInfoElement.textContent = 'No transactions in current batch, or API error.';
+                this.showTransactionDisplayStatusMessage('No transactions found at this time.');
+                if(this.slideshowInfoElement) this.slideshowInfoElement.textContent = 'No transactions in current batch.';
             }
         },
 

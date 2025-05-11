@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stimuli Network - Helping People Reach Their Goals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Base Styles */
+        body { font-family: 'Inter', sans-serif; }
+        a, button { transition: all 0.2s ease-in-out; }
+        section[id] { scroll-margin-top: 70px; /* Adjusted for sticky header */ }
+        #top { scroll-margin-top: 0; } /* Ensure top section aligns correctly */
+
+        /* Hero Animations */
+        #hero-headline { display: block; line-height: 1.1; }
+        /* #hero-subheadline styling is primarily handled by animation classes */
+
+        @keyframes heroTextFadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes heroTextFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes heroTextSlideUpIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes heroTextSlideDownIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes heroTextZoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        .hero-text-animate-out { animation: heroTextFadeOut 0.5s ease-in forwards; }
+        .hero-text-animate-fade-in { animation: heroTextFadeIn 0.6s ease-out forwards; }
+        .hero-text-animate-slide-up-in { animation: heroTextSlideUpIn 0.6s ease-out forwards; }
+        .hero-text-animate-slide-down-in { animation: heroTextSlideDownIn 0.6s ease-out forwards; }
+        .hero-text-animate-zoom-in { animation: heroTextZoomIn 0.6s ease-out forwards; }
+        
+        /* Post Content Toggle */
+        .post-content-wrapper { overflow: hidden; transition: max-height 0.5s ease-out; }
+        .post-content-wrapper p { margin-bottom: 0.75rem; }
+        .post-content-wrapper p:last-child { margin-bottom: 0; }
+
+        .post-content-collapsed {
+            max-height: calc((1em * 1.4 * 4.5)); /* Approx 4.5 lines */
+            -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+        }
+        .post-content-expanded { max-height: none; -webkit-mask-image: none; mask-image: none; }
+
+        /* Post Actions Area */
+        .post-actions {
+            transition: opacity 0.3s ease-out, visibility 0.3s ease-out, margin-top 0.3s ease-out, height 0.3s ease-out, padding-top 0.3s ease-out, border-top 0.3s ease-out;
+            opacity: 1; visibility: visible; margin-top: 1rem; padding-top: 0.75rem;
+            border-top: 1px solid #f3f4f6; /* Tailwind gray-100 */
+            height: auto; overflow: visible;
+        }
+        .post-actions.hidden {
+            opacity: 0; visibility: hidden; margin-top: 0; padding-top: 0;
+            border-top: none; height: 0; overflow: hidden;
+        }
+        .comment-btn {}
+
+        /* Comments Container */
+        .comments-container {
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out, margin-top 0.5s ease-out, padding-top 0.5s ease-out, border-top 0.5s ease-out;
+            opacity: 1; visibility: visible;
+            margin-top: 0; padding-top: 0; border-top: none;
+            max-height: 300px; /* Max height for scrollable comments */
+            overflow-y: auto;
+            scrollbar-width: thin; /* For Firefox */
+            scrollbar-color: #cbd5e1 #f1f5f9; /* For Firefox: thumb and track color */
+        }
+        .comments-container.comments-active {
+            margin-top: 1rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #e5e7eb; /* Tailwind gray-200 */
+        }
+        .comments-container.hidden {
+            height: 0;
+            opacity: 0; visibility: hidden; margin-top: 0;
+            padding-top: 0; border-top: none; overflow: hidden;
+            transition: opacity 0.3s ease-out, visibility 0s linear 0.3s, height 0.4s ease-out, margin-top 0.4s ease-out, padding-top 0.4s ease-out, border-top 0.4s ease-out;
+        }
+         /* Webkit scrollbar styles */
+         .comments-container::-webkit-scrollbar { width: 6px; }
+         .comments-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px;} /* Tailwind gray-100 */
+         .comments-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; } /* Tailwind gray-300 */
+         .comments-container::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; } /* Tailwind gray-400 */
+
+        .comment-count {
+            transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+            opacity: 1; visibility: visible;
+            min-width: 25px; /* Ensure space for numbers */
+            text-align: center;
+            display: inline-block;
+        }
+        .comment-count.invisible { opacity: 0; visibility: hidden; }
+        .comment-count.loading { opacity: 0.6; }
+        .comment-count[aria-busy="true"] { opacity: 0.6; }
+
+        .comment-thread {
+            margin-bottom: 0.75rem; /* space between comment threads */
+            position: relative; /* For potential future absolute positioned elements within */
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+        .comment-thread.visible { opacity: 1; transform: translateY(0); }
+         .comment { display: flex; align-items: flex-start; padding-top: 8px; }
+         .comment-avatar { width: 32px; height: 32px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; background-color: #e2e8f0; /* Tailwind gray-200 */ }
+         .comment-content { flex-grow: 1; padding-top: 2px; /* Align text with avatar center */ }
+         .comment-author { font-weight: 600; color: #1f2937; /* Tailwind gray-800 */ margin-right: 6px; }
+         .comment-text { font-size: 0.875rem; color: #4b5563; /* Tailwind gray-600 */ line-height: 1.4; }
+         .replies-wrapper { margin-left: 44px; /* Indent replies */ margin-top: 0.5rem; border-left: 2px solid #e5e7eb; /* Tailwind gray-200 */ padding-left: 12px; }
+         .reply { display: flex; align-items: flex-start; padding-top: 6px; padding-bottom: 6px; opacity: 0; transform: translateY(8px); transition: opacity 0.35s ease-out, transform 0.35s ease-out; }
+         .reply.visible { opacity: 1; transform: translateY(0); }
+         .reply .comment-avatar { width: 28px; height: 28px; margin-right: 10px;}
+         .reply .comment-content { padding-top: 0px; }
+         .reply .comment-author { font-weight: 500; font-size: 0.8rem;}
+         .reply .comment-text { font-size: 0.85rem; color: #4b5563; /* Tailwind gray-600 */ }
+
+        /* Disclaimer Modal */
+        #disclaimer-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        #disclaimer-modal.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .disclaimer-modal-content { background-color: white; padding: 2rem; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); text-align: center; max-width: 450px; width: 90%; }
+        body.content-hidden #main-header, body.content-hidden main, body.content-hidden footer { display: none; }
+
+        /* Animated Logo */
+        #animated-logo {
+            display: inline-flex; 
+            align-items: center;
+        }
+        .logo-icon { 
+            animation: heartbeat-scale 1.5s infinite ease-in-out, heartbeat-color 1.5s infinite ease-in-out;
+            display: inline-block; 
+            font-size: 0.8em; 
+            line-height: 1; 
+        }
+
+        @keyframes heartbeat-scale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); } 
+        }
+        @keyframes heartbeat-color { /* Emoji color is fixed, this is illustrative */
+            0%, 20%, 100% { } 35% { } 50%, 65% { } 80% { }      
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-light content-hidden">
+
+    <div id="disclaimer-modal">
+        <div class="disclaimer-modal-content">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Disclaimer</h3>
+            <p class="text-sm text-gray-600 mb-6 leading-relaxed">
+                Stimuli.Network is a simulated preview,<br>
+                generated by AI for demo purposes only!
+                <br><br>
+                Proceed?
+            </p>
+            <div class="flex justify-center space-x-4">
+                <button id="disclaimer-no-btn" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-lg shadow"> No </button>
+                <button id="disclaimer-yes-btn" class="bg-blue-700 hover:bg-blue-800 text-white font-medium py-2 px-6 rounded-lg shadow"> Yes </button>
+            </div>
+        </div>
+    </div>
+
+    <header id="main-header" class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" id="animated-logo" class="text-2xl font-bold text-blue-700 nav-link">
+                <span class="logo-text">Stimuli</span>
+                <span class="mx-1 logo-icon">🇺🇸</span>
+                <span class="logo-text">Network</span>
+            </a>
+            <div class="hidden md:flex space-x-4 items-center">
+                <a href="#top" class="text-gray-600 hover:text-blue-700 nav-link">Home</a>
+                <a href="#about" class="text-gray-600 hover:text-blue-700 nav-link">About Us</a>
+                <a href="#impact" class="text-gray-600 hover:text-blue-700 nav-link">Our Vision</a>
+                <a href="#involved" class="text-gray-600 hover:text-blue-700 nav-link">Get Involved</a>
+                <a href="#community" class="text-gray-600 hover:text-blue-700 nav-link">Community</a>
+                <a href="#footer-contact" class="text-gray-600 hover:text-blue-700 nav-link">Contact</a>
+            </div>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-gray-600 focus:outline-none" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <a href="#top" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">Home</a>
+            <a href="#about" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">About Us</a>
+            <a href="#impact" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">Our Vision</a>
+            <a href="#involved" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">Get Involved</a>
+            <a href="#community" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">Community</a>
+            <a href="#footer-contact" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 nav-link">Contact</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="top" class="bg-gradient-to-r from-blue-700 to-blue-900 text-white py-20 md:py-32">
+            <div class="container mx-auto px-6 text-center">
+                <h1 id="hero-headline" class="text-lg sm:text-xl md:text-2xl font-medium mb-4 leading-tight"> Unlock Your Potential </h1>
+                <p id="hero-subheadline" class="text-sm md:text-base mb-8 text-blue-100 max-w-3xl mx-auto"> Stimuli Network is an initiative dedicated to helping people reach their goals. Join us in building a supportive community for all in need. </p>
+                <div class="mt-8">
+                     <a href="#involved" class="bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-8 rounded-lg shadow nav-link text-base">Get Involved</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Our Story</h2>
+                    <p class="text-gray-600 mb-4 leading-relaxed">
+                        Stimuli Network is an emerging initiative focused on empowering individuals to achieve their personal and professional goals. Founded by Adrian Mowrey, a passionate Computer Science student, our core belief is that everyone deserves the opportunity to reach their full potential.
+                    </p>
+                    <p class="text-gray-600 leading-relaxed">
+                        We aim to build a supportive network offering crucial resources. We are actively seeking partners and funding to launch this mission and benefit all who need support.
+                    </p>
+                </div>
+                <div>
+                    <img src="images/AM.png" alt="Adrian Mowrey, Founder of Stimuli Network" class="rounded-lg shadow-lg w-full max-w-md mx-auto h-auto object-cover" loading="lazy" onerror="this.src='https://placehold.co/600x400/e2e8f0/cbd5e0?text=Founder+Photo'; this.alt='Placeholder image for founder photo'">
+                    <p class="text-center text-sm text-gray-500 mt-2">Adrian Mowrey, Founder</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="impact" class="py-16 md:py-24 bg-gray-100">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-12">Our Vision</h2>
+                <p id="vision-intro-text" class="text-gray-600 mb-12 max-w-2xl mx-auto">As we establish Stimuli Network and grow, our key goals are:</p>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-md flex flex-col">
+                        <div class="text-blue-700 mb-4 text-4xl"> <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Register as a Nonprofit</h3>
+                        <p class="text-gray-600 flex-grow">Formalize our structure to maximize impact and transparency. We are currently seeking funding to complete the registration process and officially launch our mission.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md flex flex-col">
+                        <div class="text-blue-700 mb-4 text-4xl"> <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg> </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Offer Internships</h3>
+                        <p class="text-gray-600 flex-grow">Provide valuable work experience to students by connecting them with partners serving communities across the United States.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md flex flex-col">
+                        <div class="text-blue-700 mb-4 text-4xl"> <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path d="M12 14l9-5-9-5-9 5 9 5z" /><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" /></svg> </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Build Scholarship Fund</h3>
+                        <p class="text-gray-600 flex-grow">Create a dedicated fund to support students who face financial barriers in completing their studies.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+            <section id="involved" class="py-16 md:py-24 bg-white">
+                <div class="container mx-auto px-6 text-center">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Get Involved</h2>
+                    <p id="involved-intro-text" class="text-gray-600 mb-12 max-w-2xl mx-auto">
+                        There are many ways to contribute to Stimuli Network. Your time and skills are invaluable as we launch this initiative.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+                        <div class="border bg-gray-50 border-gray-200 rounded-lg p-8 text-left hover:shadow-lg transition-shadow duration-300">
+                            <h3 class="text-2xl font-semibold text-gray-800 mb-4">Volunteer</h3>
+                            <p class="text-gray-600 mb-6">Lend your time and skills. As we grow, we'll need passionate individuals to help us achieve our mission.</p>
+                            <a href="#footer-contact" class="bg-blue-700 hover:bg-blue-800 text-white font-medium py-2 px-6 rounded-lg shadow nav-link">Express Interest</a>
+                        </div>
+                        <div class="border bg-gray-50 border-gray-200 rounded-lg p-8 text-left hover:shadow-lg transition-shadow duration-300">
+                            <h3 class="text-2xl font-semibold text-gray-800 mb-4">Partner With Us</h3>
+                            <p class="text-gray-600 mb-6">Collaborate with Stimuli Network to amplify our impact. We're looking for organizations and individuals who share our vision.</p>
+                            <a href="#footer-contact" class="bg-white text-blue-700 border border-blue-700 hover:bg-blue-50 font-medium py-2 px-6 rounded-lg shadow nav-link">Become a Partner</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="community" class="py-16 md:py-24 bg-gray-100">
+                <div class="container mx-auto px-6">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-12 text-center">Community Updates</h2>
+                    <div id="community-posts-container" class="max-w-2xl mx-auto">
+                        <p id="posts-loading-message" class="text-center text-gray-500 italic">Generating community update...</p>
+                    </div>
+                </div>
+            </section>
+
+    </main>
+
+    <footer id="footer-contact" class="bg-gray-800 text-gray-300 py-12">
+        <div class="container mx-auto px-6 text-center">
+            <div class="mb-8">
+                <h4 class="text-xl font-semibold text-white mb-2">Get in Touch</h4>
+                <p class="text-sm text-gray-400 mb-3 max-w-md mx-auto">Have questions or want to partner or volunteer?<br>We'd love to hear from you.</p>
+                <p class="text-sm mb-2">
+                    <a href="mailto:Contact@Stimuli.Network" class="text-blue-400 hover:text-blue-300">Contact@Stimuli.Network</a>
+                </p>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-sm">
+                <p> <span id="current-year"></span> Stimuli Network. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const stimuliApp = {
+            // --- Configuration ---
+            config: {
+                API_ENDPOINT_POST_CONTENT: 'https://stimuli-network-442m.onrender.com/api/generate-post-content',
+                API_ENDPOINT_COMMENTS: 'https://stimuli-network-442m.onrender.com/api/generate-comment',
+                API_ENDPOINT_PING: 'https://stimuli-network-442m.onrender.com/api/ping',
+                MIN_DISPLAY_DELAY_MS: 30000, // Min delay for comment appearance
+                MAX_DISPLAY_DELAY_MS: 180000, // Max delay for comment appearance
+                REPLY_PROBABILITY: 0.3, // Chance of a comment being a reply
+                AUTHOR_NAMES: ["Alex", "Jamie", "Morgan", "Taylor", "Casey", "Jordan", "Riley", "Skyler", "Ash", "Kai", "Devon", "Rowan", "Max", "Eli", "Finn", "Dakota", "Avery", "Remi", "Charlie", "Blake", "Drew", "Hayden", "Jesse", "Quinn", "Lee", "Sage", "Cameron", "Micah", "Noel", "Phoenix"],
+                DUMMY_REPLIES: [
+                    "Good point!", "Interesting thought.", "I agree.", "Makes sense.", "Thanks for sharing.",
+                    "Helpful perspective.", "Couldn't have said it better.", "Exactly!", "Totally.", "Right on.",
+                    "Well said.", "That resonates.", "True.", "Indeed.", "For sure.", "Got it.", "Understood.",
+                    "Nice addition.", "Valuable input.", "Great insight.", "I see what you mean.", "That's clear.",
+                    "Appreciate the clarification.", "Thanks!", "Cool.", "Okay.", "Fair enough.", "Word.", "Yep.",
+                    "Absolutely.", "Spot on.", "Love this.", "Great comment."
+                ],
+                COLLAPSED_LINES: 4.5, // Number of lines to show before "Show more"
+                ANIMATION_INTERVAL_HERO_MIN_MS: 10000, // Min interval for hero subheadline (10 seconds)
+                ANIMATION_INTERVAL_HERO_MAX_MS: 20000  // Max interval for hero subheadline (20 seconds)
+            },
+            state: {
+                loadingCommentCount: {}, 
+                postCommentCounts: {},  
+                activeSimulations: {},  
+                heroSubheadlinesList: [ 
+                    "Discover your strengths and share them with a supportive community.",
+                    "Unlock new possibilities with resources for personal and professional development.",
+                    "Celebrating every step forward: Member achievements and shared growth.",
+                    "Connect with inspiring ideas and fuel your journey to success.",
+                    "Collaborate on meaningful projects that make a real difference.",
+                    "Find purpose and impact by lending your unique skills and talents.",
+                    "Explore innovative solutions and contribute to positive change.",
+                    "Nurture your ambitions and well-being on your path to fulfillment.",
+                    "Ignite your creativity and brainstorm transformative ideas with peers.",
+                    "Navigate challenges with the strength of a supportive network.",
+                    "Build authentic connections that foster growth and open doors.",
+                    "Accelerate your journey with pathways to new opportunities.",
+                    "Expand your horizons through continuous learning and shared knowledge.",
+                    "Find guidance and inspiration through meaningful connections.",
+                    "Make a tangible impact through community-focused initiatives.",
+                    "Develop your leadership potential and inspire others along the way.",
+                    "Empower yourself with new skills for a rapidly evolving world.",
+                    "Join a circle of innovators and entrepreneurs driving change.",
+                    "Showcase your unique talents and inspire the Stimuli Network community.",
+                    "Gain broader perspectives through collaboration and diverse insights.",
+                    "Prepare for the future by embracing new skills and emerging trends.",
+                    "Enhance your effectiveness with proven strategies for success.",
+                    "Achieve your personal and professional goals with community support.",
+                    "Master the art of communication and amplify your voice.",
+                    "Craft a compelling narrative that reflects your unique potential.",
+                    "Leverage collective wisdom to make informed, impactful decisions.",
+                    "Contribute to a sustainable future through conscious action and innovation.",
+                    "Gain valuable skills to navigate and succeed in all aspects of life.",
+                    "Explore the vital link between well-being and peak performance.",
+                    "Experience the power of collaboration in achieving shared success."
+                ],
+                usedSubheadlineIndexes: [], 
+                postGenerationTriggered: false,
+            },
+
+            // Utility function to split text into two lines, attempting to balance them
+            splitTextIntoTwoLines(text) {
+                const words = text.split(' ');
+                if (words.length <= 6) return text; // Don't split very short texts or if it makes one line too short
+
+                const totalLength = text.length;
+                let bestSplitPoint = -1;
+                let minDifference = Infinity;
+
+                // Iterate through possible split points (after each word)
+                for (let i = 0; i < words.length -1; i++) {
+                    const line1Length = words.slice(0, i + 1).join(' ').length;
+                    const line2Length = totalLength - line1Length -1; // -1 for the space
+                    
+                    // Avoid splits that make one line too short (e.g., less than 20% of total)
+                    if (line1Length < totalLength * 0.2 || line2Length < totalLength * 0.2) {
+                        continue;
+                    }
+
+                    const difference = Math.abs(line1Length - line2Length);
+                    if (difference < minDifference) {
+                        minDifference = difference;
+                        bestSplitPoint = i;
+                    }
+                }
+
+                if (bestSplitPoint !== -1) {
+                    const line1 = words.slice(0, bestSplitPoint + 1).join(' ');
+                    const line2 = words.slice(bestSplitPoint + 1).join(' ');
+                    return `${line1}<br>${line2}`;
+                }
+                return text; // Return original if no good split found
+            },
+
+            // Resets the state of a specific post (comments, buttons, etc.)
+            resetPostState(postId) {
+                const simulation = this.state.activeSimulations[postId];
+                if (simulation && simulation.timeoutId) { clearTimeout(simulation.timeoutId); }
+                delete this.state.activeSimulations[postId];
+                delete this.state.loadingCommentCount[postId];
+                delete this.state.postCommentCounts[postId];
+
+                const postElement = document.querySelector(`.community-post[data-post-id="${postId}"]`);
+                if (!postElement) return;
+
+                const commentsContainer = postElement.querySelector(`#comments-container-${postId}`);
+                const commentCountElement = postElement.querySelector(`#comment-count-${postId}`);
+                const postActionsDiv = postElement.querySelector(`#post-actions-${postId}`);
+                const commentIconBtn = postElement.querySelector(`.comment-btn[data-post-id="${postId}"]`);
+
+                if (commentCountElement) {
+                    commentCountElement.textContent = '0 / 0';
+                    commentCountElement.classList.add('invisible');
+                    commentCountElement.classList.remove('loading');
+                    commentCountElement.setAttribute('aria-busy', 'false');
+                }
+                if (commentsContainer) {
+                    commentsContainer.innerHTML = '';
+                    commentsContainer.classList.add('hidden');
+                    commentsContainer.classList.remove('comments-active');
+                }
+                if (commentIconBtn) {
+                    commentIconBtn.setAttribute('aria-expanded', 'false');
+                }
+                // If "Show more" is visible (meaning content is collapsed), hide actions.
+                const showMoreBtn = postElement.querySelector(`#show-more-${postId}`);
+                if (postActionsDiv && showMoreBtn && !showMoreBtn.classList.contains('hidden')) {
+                    postActionsDiv.classList.add('hidden');
+                }
+            },
+
+            // Resets other posts when one post is expanded or interacted with
+            resetOtherPosts(currentPostId) {
+                document.querySelectorAll('.community-post').forEach(post => {
+                    const postId = post.getAttribute('data-post-id');
+                    if (postId && postId !== currentPostId) {
+                        const otherShowLessBtn = post.querySelector(`#show-less-${postId}`);
+                        const isExpanded = otherShowLessBtn && !otherShowLessBtn.classList.contains('hidden');
+                        this.resetPostState(postId); // Reset comments and comment-related UI
+
+                        // If the other post was expanded, collapse it
+                        if (isExpanded) {
+                            const contentWrapper = post.querySelector(`#post-content-${postId}`);
+                            const showMoreBtn = post.querySelector(`#show-more-${postId}`);
+                            const postActionsDiv = post.querySelector(`#post-actions-${postId}`);
+                            const commentIconBtn = post.querySelector(`.comment-btn[data-post-id="${postId}"]`);
+
+                            if (contentWrapper && showMoreBtn && otherShowLessBtn && postActionsDiv) {
+                                const computedStyle = window.getComputedStyle(contentWrapper);
+                                const lineHeight = parseFloat(computedStyle.lineHeight);
+                                const fontSize = parseFloat(computedStyle.fontSize);
+                                const effectiveLineHeight = isNaN(lineHeight) ? fontSize * 1.4 : lineHeight;
+                                const collapsedHeightThreshold = effectiveLineHeight * this.config.COLLAPSED_LINES;
+
+                                contentWrapper.style.maxHeight = `${Math.round(collapsedHeightThreshold)}px`;
+                                setTimeout(() => { contentWrapper.classList.add('post-content-collapsed'); }, 10); // Apply mask after height transition starts
+                                contentWrapper.classList.remove('post-content-expanded');
+                                otherShowLessBtn.classList.add('hidden');
+                                showMoreBtn.classList.remove('hidden');
+                                postActionsDiv.classList.add('hidden');
+                                showMoreBtn.setAttribute('aria-expanded', 'false');
+                                otherShowLessBtn.setAttribute('aria-expanded', 'false');
+                                if(commentIconBtn) commentIconBtn.setAttribute('aria-expanded', 'false');
+                            }
+                        }
+                    }
+                });
+            },
+
+            // Creates HTML for a single comment thread
+            createCommentElementHTML(postId, commentIndex, author, avatarInitial, text) {
+                const threadDiv = document.createElement('div');
+                threadDiv.className = 'comment-thread';
+                threadDiv.setAttribute('data-comment-thread-id', `${postId}-${commentIndex}`);
+
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment';
+
+                const avatarImg = document.createElement('img');
+                avatarImg.className = 'comment-avatar';
+                avatarImg.src = `https://placehold.co/32x32/e2e8f0/64748b?text=${avatarInitial}`;
+                avatarImg.alt = `${author} avatar`;
+                avatarImg.onerror = function() { this.src='https://placehold.co/32x32/e2e8f0/64748b?text=?'; } // Fallback avatar
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'comment-content';
+
+                const authorSpan = document.createElement('span');
+                authorSpan.className = 'comment-author';
+                authorSpan.textContent = author;
+
+                const textP = document.createElement('p');
+                textP.className = 'comment-text';
+                textP.textContent = text;
+
+                contentDiv.appendChild(authorSpan);
+                contentDiv.appendChild(textP);
+                commentDiv.appendChild(avatarImg);
+                commentDiv.appendChild(contentDiv);
+
+                const repliesWrapperDiv = document.createElement('div');
+                repliesWrapperDiv.className = 'replies-wrapper';
+
+                threadDiv.appendChild(commentDiv);
+                threadDiv.appendChild(repliesWrapperDiv);
+                return threadDiv;
+            },
+
+            // Creates HTML for a single reply
+            createReplyElementHTML(author, avatarInitial, text) {
+                const replyDiv = document.createElement('div');
+                replyDiv.className = 'reply';
+
+                const avatarImg = document.createElement('img');
+                avatarImg.className = 'comment-avatar'; // Smaller avatar for replies
+                avatarImg.src = `https://placehold.co/28x28/e2e8f0/718096?text=${avatarInitial}`;
+                avatarImg.alt = `${author} avatar`;
+                avatarImg.onerror = function() { this.src='https://placehold.co/28x28/e2e8f0/718096?text=?'; }
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'comment-content';
+
+                const authorSpan = document.createElement('span');
+                authorSpan.className = 'comment-author';
+                authorSpan.textContent = author;
+
+                const textP = document.createElement('p');
+                textP.className = 'comment-text';
+                textP.textContent = text;
+
+                contentDiv.appendChild(authorSpan);
+                contentDiv.appendChild(textP);
+                replyDiv.appendChild(avatarImg);
+                replyDiv.appendChild(contentDiv);
+                return replyDiv;
+            },
+
+            // Loads comments for a post and prepares them for display
+            async loadAndPrepareComments(postId) {
+                if (this.state.loadingCommentCount[postId]) return; // Already loading for this post
+                this.state.loadingCommentCount[postId] = true;
+                this.state.postCommentCounts[postId] = 0; // Reset count
+                this.state.activeSimulations[postId] = { commentsData: [], displayedCommentCount: 0, timeoutId: null, totalFetchedCount: 0 };
+
+                this.resetOtherPosts(postId); // Collapse other posts and their comments
+
+                const postElement = document.querySelector(`.community-post[data-post-id="${postId}"]`);
+                if (!postElement) { console.error(`Post element not found for ID: ${postId}`); return; }
+
+                const commentsContainer = postElement.querySelector(`#comments-container-${postId}`);
+                const commentCountElement = postElement.querySelector(`#comment-count-${postId}`);
+                const postActionsDiv = postElement.querySelector(`#post-actions-${postId}`);
+                const postContentElement = postElement.querySelector(`#post-content-${postId}`); // For context
+
+                if (!commentsContainer || !commentCountElement || !postActionsDiv || !postContentElement) {
+                    console.error(`[Load&Prep ${postId}] Critical elements missing for comments.`);
+                    this.resetPostState(postId); // Clean up if elements are missing
+                    return;
+                }
+
+                postActionsDiv.classList.remove('hidden'); // Ensure actions are visible
+                commentCountElement.textContent = '...'; // Loading indicator
+                commentCountElement.classList.remove('invisible');
+                commentCountElement.classList.add('loading');
+                commentCountElement.setAttribute('aria-busy', 'true');
+
+                commentsContainer.innerHTML = ''; // Clear previous comments
+                commentsContainer.classList.add('hidden'); // Hide until ready
+                commentsContainer.classList.remove('comments-active');
+
+                // Ping server (optional, for warming up or checking status)
+                fetch(this.config.API_ENDPOINT_PING, { method: 'GET' }).catch(err => console.warn(`[Load&Prep ${postId}] Ping request failed:`, err));
+                await new Promise(resolve => setTimeout(resolve, 500)); // Artificial delay
+
+                const postText = postContentElement.textContent.substring(0, 500); // Get post context
+                let fetchedComments = [];
+                let totalFetchedCount = 0;
+
+                try {
+                    const response = await fetch(this.config.API_ENDPOINT_COMMENTS, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ context: `Reaction to post starting with: "${postText}..."` })
+                    });
+                    if (!response.ok) { console.error(`[Load&Prep ${postId}] API Error ${response.status}`); }
+                    else {
+                        const data = await response.json();
+                        if (data && Array.isArray(data.comments)) {
+                            fetchedComments = data.comments;
+                            totalFetchedCount = fetchedComments.length;
+                        } else { console.warn(`[Load&Prep ${postId}] Unexpected comment response format.`); }
+                    }
+                } catch (error) {
+                    console.error(`[Load&Prep ${postId}] Network or JSON parsing error for comments:`, error);
+                }
+
+                this.state.postCommentCounts[postId] = totalFetchedCount;
+                if (this.state.activeSimulations[postId]) { // Check if simulation still exists
+                    this.state.activeSimulations[postId].commentsData = fetchedComments;
+                    this.state.activeSimulations[postId].totalFetchedCount = totalFetchedCount;
+                } else {
+                    console.warn(`[Load&Prep ${postId}] Simulation state removed before comments could be stored.`);
+                    delete this.state.loadingCommentCount[postId];
+                    return; // Stop if simulation was cancelled
+                }
+
+                // Update comment count display, ensuring it's still relevant
+                const finalCommentCountElement = postElement.querySelector(`#comment-count-${postId}`);
+                if (finalCommentCountElement) {
+                    const finalPostActionsDiv = postElement.querySelector(`#post-actions-${postId}`);
+                    finalCommentCountElement.setAttribute('aria-busy', 'false');
+                    if (finalPostActionsDiv && !finalPostActionsDiv.classList.contains('hidden')) { // Only update if actions are still visible
+                        finalCommentCountElement.textContent = `0 / ${totalFetchedCount}`;
+                        finalCommentCountElement.classList.remove('loading');
+                        if (totalFetchedCount === 0) {
+                            finalCommentCountElement.classList.add('invisible');
+                            finalCommentCountElement.textContent = '0 / 0'; // Reset for clarity
+                        } else {
+                            finalCommentCountElement.classList.remove('invisible');
+                        }
+                    } else { // If actions became hidden, reset to default invisible state
+                        finalCommentCountElement.textContent = '0 / 0';
+                        finalCommentCountElement.classList.add('invisible');
+                        finalCommentCountElement.classList.remove('loading');
+                    }
+                }
+
+                if (totalFetchedCount > 0) {
+                    this.startCommentDisplay(postId); // Begin phased display of comments
+                }
+                delete this.state.loadingCommentCount[postId]; // Clear loading flag
+            },
+
+            // Starts the timed display of comments for a post
+            startCommentDisplay(postId) {
+                const simulation = this.state.activeSimulations[postId];
+                if (!simulation || simulation.timeoutId) return; // Already running or no simulation
+                if (!simulation.commentsData || simulation.commentsData.length === 0) return; // No comments to display
+
+                const commentsContainer = document.getElementById(`comments-container-${postId}`);
+                if (!commentsContainer) { this.resetPostState(postId); return; } // Container missing
+
+                simulation.displayedCommentCount = 0;
+                commentsContainer.innerHTML = ''; // Clear again just in case
+                commentsContainer.classList.remove('hidden'); // Show container
+                commentsContainer.classList.add('comments-active'); // Add active styles
+
+                this.scheduleNextDisplay(postId, true); // Schedule the first comment
+            },
+
+            // Schedules the display of the next comment or reply
+            scheduleNextDisplay(postId, isFirstCall = false) {
+                const simulation = this.state.activeSimulations[postId];
+                if (!simulation) return; // Simulation was cancelled
+
+                if (simulation.timeoutId) { clearTimeout(simulation.timeoutId); simulation.timeoutId = null; }
+
+                // Stop if all main comments are displayed (replies are handled within displayNextItem)
+                if (simulation.displayedCommentCount >= simulation.totalFetchedCount && !isFirstCall) {
+                    return;
+                }
+
+                const delay = isFirstCall ? 100 : Math.random() * (this.config.MAX_DISPLAY_DELAY_MS - this.config.MIN_DISPLAY_DELAY_MS) + this.config.MIN_DISPLAY_DELAY_MS;
+                simulation.timeoutId = setTimeout(() => {
+                    if (!this.state.activeSimulations[postId]) return; // Check again if simulation was cancelled during delay
+                    this.displayNextItem(postId);
+                    if (this.state.activeSimulations[postId]) { // If still active, schedule next
+                        this.scheduleNextDisplay(postId);
+                    }
+                }, delay);
+            },
+
+            // Displays the next comment or a reply to an existing comment
+            displayNextItem(postId) {
+                const simulation = this.state.activeSimulations[postId];
+                if (!simulation) return; // Simulation cancelled
+
+                const commentsContainer = document.getElementById(`comments-container-${postId}`);
+                const commentCountElement = document.getElementById(`comment-count-${postId}`);
+
+                // Ensure elements are still in the DOM
+                if (!commentsContainer || !document.body.contains(commentsContainer) || !commentCountElement) {
+                    this.resetPostState(postId); // Clean up if elements are gone
+                    return;
+                }
+
+                const totalFetchedCount = simulation.totalFetchedCount;
+                const canAddReply = simulation.displayedCommentCount > 0; // Can only reply if there's at least one comment
+
+                // Decide whether to add a new comment or a reply
+                const shouldAddComment = simulation.displayedCommentCount < totalFetchedCount && (!canAddReply || Math.random() > this.config.REPLY_PROBABILITY);
+
+                if (shouldAddComment) {
+                    const commentIndex = simulation.displayedCommentCount;
+                    const commentText = simulation.commentsData[commentIndex];
+                    const author = this.config.AUTHOR_NAMES[Math.floor(Math.random() * this.config.AUTHOR_NAMES.length)];
+                    const avatarInitial = author.charAt(0).toUpperCase();
+
+                    const newCommentThreadElement = this.createCommentElementHTML(postId, commentIndex, author, avatarInitial, commentText);
+                    commentsContainer.appendChild(newCommentThreadElement);
+                    // Animate in
+                    requestAnimationFrame(() => {
+                        setTimeout(() => { if (document.body.contains(newCommentThreadElement)) newCommentThreadElement.classList.add('visible'); }, 50);
+                    });
+                    simulation.displayedCommentCount++;
+                    commentCountElement.textContent = `${simulation.displayedCommentCount} / ${totalFetchedCount}`;
+                } else if (canAddReply) {
+                    const visibleThreads = commentsContainer.querySelectorAll('.comment-thread.visible');
+                    if (visibleThreads.length > 0) {
+                        const targetThread = visibleThreads[Math.floor(Math.random() * visibleThreads.length)]; // Pick a random visible thread to reply to
+                        const repliesWrapper = targetThread.querySelector('.replies-wrapper');
+                        if (repliesWrapper) {
+                            const replyAuthor = this.config.AUTHOR_NAMES[Math.floor(Math.random() * this.config.AUTHOR_NAMES.length)];
+                            const replyAvatarInitial = replyAuthor.charAt(0).toUpperCase();
+                            const replyText = this.config.DUMMY_REPLIES[Math.floor(Math.random() * this.config.DUMMY_REPLIES.length)];
+                            const newReplyElement = this.createReplyElementHTML(replyAuthor, replyAvatarInitial, replyText);
+                            repliesWrapper.appendChild(newReplyElement);
+                            // Animate in
+                            requestAnimationFrame(() => {
+                                setTimeout(() => { if(document.body.contains(newReplyElement)) newReplyElement.classList.add('visible'); }, 50);
+                            });
+                        }
+                    }
+                }
+                // Auto-scroll if near the bottom
+                if (commentsContainer.scrollHeight - commentsContainer.scrollTop - commentsContainer.clientHeight < 100) {
+                    commentsContainer.scrollTo({ top: commentsContainer.scrollHeight, behavior: 'smooth' });
+                }
+            },
+
+            // Initializes mobile menu and smooth scrolling for navigation links
+            initializeMenuAndScroll() {
+                const menuButton = document.getElementById('mobile-menu-button');
+                const mobileMenu = document.getElementById('mobile-menu');
+                const header = document.getElementById('main-header');
+
+                if(menuButton && mobileMenu) {
+                    menuButton.addEventListener('click', () => {
+                        const isHidden = mobileMenu.classList.toggle('hidden');
+                        menuButton.setAttribute('aria-expanded', String(!isHidden));
+                    });
+                }
+
+                const navLinks = document.querySelectorAll('a.nav-link[href^="#"]');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        if (document.body.classList.contains('content-hidden')) return; // Don't scroll if disclaimer is active
+
+                        let targetId = link.getAttribute('href');
+                        let targetElement = null;
+                        try {
+                            if (targetId && targetId !== '#') { // Ensure targetId is not just "#"
+                                targetElement = document.querySelector(targetId);
+                            }
+                        } catch (error) {
+                            console.error("Invalid selector for nav link:", targetId, error);
+                            return; // Exit if selector is invalid
+                        }
+
+                        let targetPosition = 0; // Default to top of page
+                        if (targetElement && targetId !== '#top') {
+                            const headerOffset = header ? header.offsetHeight : 70; // Fallback header height
+                            const isFooterLink = targetId === '#footer-contact'; // Special handling for footer link if needed
+                            const elementPosition = targetElement.getBoundingClientRect().top;
+                            targetPosition = elementPosition + window.pageYOffset - (isFooterLink ? 0 : headerOffset);
+                        } else if (!targetElement || targetId === '#top') {
+                            targetPosition = 0; // Scroll to very top
+                        }
+
+
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: "smooth"
+                        });
+
+                        // Close mobile menu after clicking a link
+                        if (mobileMenu && !mobileMenu.classList.contains('hidden') && link.closest('#mobile-menu')) {
+                            mobileMenu.classList.add('hidden');
+                            menuButton.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                });
+            },
+            // Sets the copyright year in the footer
+            setCopyrightYear() {
+                const currentYearEl = document.getElementById('current-year');
+                if (currentYearEl) {
+                    currentYearEl.textContent = new Date().getFullYear();
+                }
+            },
+            // Placeholder for dynamic view counter initialization (if needed later)
+            initializeViewCounters() { /* Currently static, can be expanded */ },
+
+            // Initializes the hero section's subheadline animation
+            initializeHeroAnimation() {
+                const heroHeadlineElement = document.getElementById('hero-headline');
+                const heroSubheadlineElement = document.getElementById('hero-subheadline');
+                const headlines = [
+                    "Unlock Your Potential.", "Building Futures, Connecting People.", "Ignite Your Possibilities.",
+                    "Connecting Talent, Creating Opportunity.", "Achieve More with Stimuli Network.",
+                    "Reach Your Goals, Together.", "Empowering Your Journey Forward."
+                ];
+                // Use new class names for hero text animations
+                const animationInClasses = ['hero-text-animate-fade-in', 'hero-text-animate-slide-up-in', 'hero-text-animate-slide-down-in', 'hero-text-animate-zoom-in'];
+                let currentSubheadlineIndex = 0;
+                let previousInClass = '';
+                let nextChangeTimeout;
+                const self = this; 
+
+                if (heroHeadlineElement) {
+                    const randomIndex = Math.floor(Math.random() * headlines.length);
+                    heroHeadlineElement.textContent = headlines[randomIndex];
+                    heroHeadlineElement.classList.add('text-lg', 'sm:text-xl', 'md:text-2xl', 'font-medium', 'leading-tight');
+                }
+
+                if (heroSubheadlineElement) {
+                    const scheduleNextChange = () => {
+                        // Use config for animation interval
+                        const randomInterval = (Math.random() * (self.config.ANIMATION_INTERVAL_HERO_MAX_MS - self.config.ANIMATION_INTERVAL_HERO_MIN_MS)) + self.config.ANIMATION_INTERVAL_HERO_MIN_MS;
+                        clearTimeout(nextChangeTimeout);
+                        if (!document.body.classList.contains('content-hidden')) { 
+                            nextChangeTimeout = setTimeout(changeSubheadline, randomInterval);
+                        }
+                    };
+
+                    const changeSubheadline = () => {
+                        if (!heroSubheadlineElement || document.body.classList.contains('content-hidden')) {
+                            clearTimeout(nextChangeTimeout); 
+                            return;
+                        }
+                        // Use new class name for fade out
+                        heroSubheadlineElement.classList.add('hero-text-animate-out');
+                        if (previousInClass) { heroSubheadlineElement.classList.remove(previousInClass); }
+
+                        setTimeout(() => {
+                            if (!heroSubheadlineElement) return; 
+                            currentSubheadlineIndex = (currentSubheadlineIndex + 1) % self.state.heroSubheadlinesList.length;
+                            const nextSubheadlineText = self.state.heroSubheadlinesList[currentSubheadlineIndex];
+                            heroSubheadlineElement.innerHTML = self.splitTextIntoTwoLines(nextSubheadlineText); 
+
+                            const randomAnimationIndex = Math.floor(Math.random() * animationInClasses.length);
+                            const nextInClass = animationInClasses[randomAnimationIndex]; // These are already the new names
+                            // Use new class name for fade out removal
+                            heroSubheadlineElement.classList.remove('hero-text-animate-out');
+                            heroSubheadlineElement.classList.add(nextInClass);
+                            previousInClass = nextInClass;
+                            scheduleNextChange(); 
+                        }, 500); 
+                    };
+
+                    const initialSubheadlineText = self.state.heroSubheadlinesList[currentSubheadlineIndex];
+                    heroSubheadlineElement.innerHTML = self.splitTextIntoTwoLines(initialSubheadlineText); 
+                    heroSubheadlineElement.style.opacity = '1'; // Ensure it's visible for the first animation
+                     // Use new class name for initial animation
+                    const initialAnimationClass = 'hero-text-animate-fade-in'; 
+                    heroSubheadlineElement.classList.add(initialAnimationClass);
+                    previousInClass = initialAnimationClass;
+                    scheduleNextChange(); 
+                }
+            },
+            
+            // Initializes splitting for specific intro paragraphs
+            initializeIntroParagraphSplitting() {
+                const visionIntroEl = document.getElementById('vision-intro-text');
+                const involvedIntroEl = document.getElementById('involved-intro-text');
+
+                if (visionIntroEl) {
+                    // Re-apply splitting for vision intro
+                    const originalText = visionIntroEl.textContent.trim(); 
+                    visionIntroEl.innerHTML = this.splitTextIntoTwoLines(originalText);
+                }
+                if (involvedIntroEl) {
+                    // Re-apply splitting for involved intro, ensuring no <br> tags are duplicated
+                     const originalText = involvedIntroEl.textContent.trim().replace(/\s*<br\s*\/?>\s*/gi, ' '); 
+                     involvedIntroEl.innerHTML = this.splitTextIntoTwoLines(originalText);
+                }
+            },
+
+
+            // Generates a single community post based on an unused subheadline
+            async generateSinglePost(isInitialCall = false) {
+                const postsContainer = document.getElementById('community-posts-container');
+                if (!postsContainer) {
+                    console.error("Community posts container not found!");
+                    return;
+                }
+
+                if (isInitialCall) {
+                    if (this.state.postGenerationTriggered && !document.getElementById('posts-loading-message')) {
+                        return;
+                    }
+                    if (!this.state.postGenerationTriggered) {
+                         this.state.postGenerationTriggered = true;
+                    }
+                }
+
+                const existingGenerateMoreButton = document.getElementById('generate-more-posts-btn');
+                if (existingGenerateMoreButton) existingGenerateMoreButton.remove();
+
+                const initialHtmlLoadingMessage = document.getElementById('posts-loading-message'); 
+
+                const availableSubheadlines = this.state.heroSubheadlinesList.filter((_, index) => !this.state.usedSubheadlineIndexes.includes(index));
+
+                if (availableSubheadlines.length === 0) {
+                    if (initialHtmlLoadingMessage) initialHtmlLoadingMessage.remove();
+                    
+                    if (this.state.usedSubheadlineIndexes.length > 0) { 
+                        if (!postsContainer.querySelector('.all-generated-message')) {
+                            const allGeneratedMessage = document.createElement('p');
+                            allGeneratedMessage.className = 'text-center text-gray-500 italic mt-4 all-generated-message';
+                            allGeneratedMessage.textContent = 'All available community updates have been generated.';
+                            postsContainer.appendChild(allGeneratedMessage);
+                        }
+                    } else { 
+                         if (postsContainer.innerHTML.trim() === '' || (initialHtmlLoadingMessage && postsContainer.contains(initialHtmlLoadingMessage) && postsContainer.childElementCount === 1) ) {
+                            postsContainer.innerHTML = `<p class="text-center text-gray-500 italic">No themes available to generate community updates.</p>`;
+                        }
+                    }
+                    return;
+                }
+
+                if (!isInitialCall && initialHtmlLoadingMessage) {
+                    initialHtmlLoadingMessage.remove();
+                }
+
+                const randomIndexInAvailable = Math.floor(Math.random() * availableSubheadlines.length);
+                const selectedSubheadlineText = availableSubheadlines[randomIndexInAvailable];
+                const originalIndexInHeroList = this.state.heroSubheadlinesList.indexOf(selectedSubheadlineText);
+                this.state.usedSubheadlineIndexes.push(originalIndexInHeroList);
+
+                const postId = `community-post-${originalIndexInHeroList}`;
+                let postContentHTML = `<p class="text-gray-500 italic">Error generating post content for "${selectedSubheadlineText.substring(0,30)}...".</p>`;
+                let tempButtonLoadingMessage = null; 
+
+                if (!isInitialCall) { 
+                    tempButtonLoadingMessage = document.createElement('p');
+                    tempButtonLoadingMessage.id = `loading-post-${originalIndexInHeroList}`; 
+                    tempButtonLoadingMessage.className = 'text-center text-gray-500 italic my-4';
+                    tempButtonLoadingMessage.textContent = `Generating post based on: "${selectedSubheadlineText.substring(0, 40)}..."`;
+                    postsContainer.appendChild(tempButtonLoadingMessage);
+                }
+                
+                let fetchSuccess = false;
+                try {
+                    const response = await fetch(this.config.API_ENDPOINT_POST_CONTENT, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ theme: selectedSubheadlineText })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data && typeof data.postText === 'string') {
+                            const paragraphs = data.postText.split(/\n\s*\n/).map(p => p.trim()).filter(p => p.length > 0);
+                            postContentHTML = paragraphs.length > 0 ? paragraphs.map(p => `<p>${p}</p>`).join('') : `<p>${data.postText}</p>`;
+                            fetchSuccess = true;
+                        } else { console.warn(`[GenerateSinglePost ${postId}] API response invalid:`, data); }
+                    } else { console.error(`[GenerateSinglePost ${postId}] API Error ${response.status}`); }
+                } catch (error) { console.error(`[GenerateSinglePost ${postId}] Fetch error:`, error); }
+
+                if (isInitialCall && initialHtmlLoadingMessage) {
+                    initialHtmlLoadingMessage.remove();
+                }
+                if (tempButtonLoadingMessage) { 
+                    tempButtonLoadingMessage.remove();
+                }
+
+                if (isInitialCall && !fetchSuccess && postsContainer.innerHTML.trim() === '') {
+                    const errorMsgElement = document.createElement('p');
+                    errorMsgElement.className = 'text-center text-red-500 italic my-4 fetch-error-message';
+                    errorMsgElement.textContent = 'Failed to generate the initial community update. Please try again later.';
+                    postsContainer.appendChild(errorMsgElement);
+                } else {
+                    const postElement = document.createElement('article');
+                    postElement.className = 'community-post bg-white/80 border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm mb-8';
+                    postElement.setAttribute('data-post-id', postId);
+                    postElement.setAttribute('data-theme', selectedSubheadlineText);
+                    postElement.innerHTML = `
+                        <div class="flex items-start space-x-4">
+                            <img class="h-12 w-12 rounded-full object-cover bg-blue-700 flex items-center justify-center" src="https://placehold.co/48x48/3B82F6/FFFFFF?text=S" alt="Stimuli Avatar" onerror="this.src='https://placehold.co/48x48/e2e8f0/cbd5e0?text=S'; this.classList.add('bg-gray-200')">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between mb-3"> <span class="font-semibold text-gray-900">Stimuli</span> </div>
+                                <div id="post-content-${postId}" class="post-content-wrapper text-sm text-gray-700" style="line-height: 1.4;"> ${postContentHTML} </div>
+                                <button id="show-more-${postId}" class="show-more-less-btn text-blue-600 hover:text-blue-800 text-sm mt-2 hidden" aria-expanded="false" aria-controls="post-content-${postId}">Show more</button>
+                                <button id="show-less-${postId}" class="show-more-less-btn text-blue-600 hover:text-blue-800 text-sm mt-2 hidden" aria-expanded="true" aria-controls="post-content-${postId}">Show less</button>
+                                <div id="post-actions-${postId}" class="post-actions hidden flex justify-start space-x-6 text-gray-500">
+                                    <button class="comment-btn flex items-center space-x-1 text-gray-500" data-post-id="${postId}" aria-label="Comments (disabled)" aria-expanded="false" aria-controls="comments-container-${postId}">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                                        <span id="comment-count-${postId}" class="comment-count text-xs invisible" aria-live="polite" aria-busy="false">0 / 0</span>
+                                    </button>
+                                    <span class="flex items-center space-x-1 text-gray-500 cursor-default">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                        <span id="view-count-${postId}" class="text-xs">0</span>
+                                    </span>
+                                </div> <div id="comments-container-${postId}" class="comments-container hidden"></div>
+                            </div>
+                        </div>
+                    </article>`;
+                    postsContainer.appendChild(postElement);
+                    this.initializeSinglePost(postElement);
+                }
+
+                const stillAvailableAfterPost = this.state.heroSubheadlinesList.filter((_, index) => !this.state.usedSubheadlineIndexes.includes(index));
+                if (stillAvailableAfterPost.length > 0) {
+                    this.addGenerateMoreButton();
+                } else {
+                    if (!postsContainer.querySelector('.all-generated-message') && !postsContainer.querySelector('.fetch-error-message')) { 
+                        const allGeneratedMsg = document.createElement('p');
+                        allGeneratedMsg.className = 'text-center text-gray-500 italic mt-4 all-generated-message';
+                        allGeneratedMsg.textContent = 'All available community updates have been generated.';
+                        postsContainer.appendChild(allGeneratedMsg);
+                    }
+                }
+            },
+
+            // Adds the "Generate Another Post..." button to the DOM
+            addGenerateMoreButton() {
+                const communitySectionContainer = document.getElementById('community')?.querySelector('.container');
+                if (!communitySectionContainer) {
+                    console.error("Community section's inner container not found for adding button.");
+                    return;
+                }
+
+                const existingButton = document.getElementById('generate-more-posts-btn');
+                if (existingButton) existingButton.remove();
+
+                const button = document.createElement('button');
+                button.id = 'generate-more-posts-btn';
+                button.textContent = 'Generate a new post...';
+                button.className = 'mt-6 mb-4 mx-auto block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg shadow transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50';
+                button.addEventListener('click', async () => {
+                    button.disabled = true;
+                    button.textContent = 'Generating...';
+                    const postsContainer = document.getElementById('community-posts-container');
+                    const allGenMsg = postsContainer?.querySelector('.all-generated-message');
+                    if (allGenMsg) allGenMsg.remove();
+                     const fetchErrorMsg = postsContainer?.querySelector('.fetch-error-message');
+                    if (fetchErrorMsg) fetchErrorMsg.remove();
+
+
+                    await this.generateSinglePost(false);
+                });
+                communitySectionContainer.appendChild(button);
+            },
+
+
+            // Initializes interactions for a single post (show more/less, comments)
+            initializeSinglePost(postElement) {
+                const postId = postElement.getAttribute('data-post-id');
+                const contentWrapper = postElement.querySelector(`#post-content-${postId}`);
+                const showMoreBtn = postElement.querySelector(`#show-more-${postId}`);
+                const showLessBtn = postElement.querySelector(`#show-less-${postId}`);
+                const postActionsDiv = postElement.querySelector(`#post-actions-${postId}`);
+                const commentIconBtn = postElement.querySelector(`.comment-btn[data-post-id="${postId}"]`);
+                const commentsContainer = postElement.querySelector(`#comments-container-${postId}`);
+                const commentCountElement = postElement.querySelector(`#comment-count-${postId}`);
+
+                if (!contentWrapper || !showMoreBtn || !showLessBtn || !postActionsDiv || !commentIconBtn || !commentsContainer || !commentCountElement) {
+                    console.warn(`Post ${postId} missing elements for toggle/comment functionality.`);
+                    return;
+                }
+
+                const computedStyle = window.getComputedStyle(contentWrapper);
+                const lineHeight = parseFloat(computedStyle.lineHeight);
+                const fontSize = parseFloat(computedStyle.fontSize);
+                const effectiveLineHeight = isNaN(lineHeight) ? fontSize * 1.4 : lineHeight; 
+                const collapsedHeightThreshold = effectiveLineHeight * this.config.COLLAPSED_LINES;
+                const self = this; 
+
+                const checkOverflow = () => {
+                    if (!contentWrapper || !showMoreBtn || !showLessBtn || !postActionsDiv || !commentCountElement) return; 
+
+                    const isManuallyExpanded = !showLessBtn.classList.contains('hidden');
+                    contentWrapper.style.display = 'none'; contentWrapper.offsetHeight; contentWrapper.style.display = '';
+
+                    const scrollHeight = contentWrapper.scrollHeight;
+                    const isOverflowing = scrollHeight > (collapsedHeightThreshold + 10); 
+
+                    showMoreBtn.classList.add('hidden');
+                    showLessBtn.classList.add('hidden');
+
+                    if (isOverflowing) {
+                        if (isManuallyExpanded) { 
+                            contentWrapper.classList.remove('post-content-collapsed');
+                            contentWrapper.classList.add('post-content-expanded');
+                            contentWrapper.style.maxHeight = `${scrollHeight}px`; 
+                            showLessBtn.classList.remove('hidden');
+                            showLessBtn.setAttribute('aria-expanded', 'true');
+                            postActionsDiv.classList.remove('hidden'); 
+                            if(self.state.activeSimulations[postId] && self.state.postCommentCounts[postId] !== undefined){
+                                const sim = self.state.activeSimulations[postId];
+                                commentCountElement.textContent = `${sim.displayedCommentCount} / ${sim.totalFetchedCount}`;
+                                if (sim.totalFetchedCount > 0) commentCountElement.classList.remove('invisible');
+                                else commentCountElement.classList.add('invisible');
+                                commentCountElement.classList.remove('loading');
+                                commentCountElement.setAttribute('aria-busy', 'false');
+                            } else if (!self.state.loadingCommentCount[postId]) { 
+                                commentCountElement.textContent = '0 / 0';
+                                commentCountElement.classList.add('invisible');
+                            }
+                        } else { 
+                            contentWrapper.classList.remove('post-content-expanded');
+                            contentWrapper.classList.add('post-content-collapsed');
+                            contentWrapper.style.maxHeight = `${Math.round(collapsedHeightThreshold)}px`;
+                            showMoreBtn.classList.remove('hidden');
+                            showMoreBtn.setAttribute('aria-expanded', 'false');
+                            postActionsDiv.classList.add('hidden'); 
+                            if (!commentCountElement.classList.contains('loading')) {
+                                commentCountElement.classList.add('invisible');
+                            }
+                            if (commentsContainer && !commentsContainer.classList.contains('hidden')) {
+                                commentsContainer.classList.add('hidden');
+                                commentsContainer.classList.remove('comments-active');
+                                if (commentIconBtn) commentIconBtn.setAttribute('aria-expanded', 'false');
+                            }
+                        }
+                    } else { 
+                        contentWrapper.classList.remove('post-content-collapsed');
+                        contentWrapper.classList.add('post-content-expanded');
+                        contentWrapper.style.maxHeight = 'none'; 
+                        postActionsDiv.classList.remove('hidden'); 
+                        showMoreBtn.setAttribute('aria-expanded', 'true'); 
+
+                        if (isManuallyExpanded && self.state.activeSimulations[postId] && self.state.postCommentCounts[postId] !== undefined) {
+                            const sim = self.state.activeSimulations[postId];
+                            commentCountElement.textContent = `${sim.displayedCommentCount} / ${sim.totalFetchedCount}`;
+                            if (sim.totalFetchedCount > 0) commentCountElement.classList.remove('invisible', 'loading');
+                            else commentCountElement.classList.add('invisible');
+                            commentCountElement.setAttribute('aria-busy', 'false');
+                        } else if (!isManuallyExpanded) { 
+                             if (!self.state.loadingCommentCount[postId] && !self.state.activeSimulations[postId]) {
+                                postActionsDiv.classList.remove('hidden'); 
+                                commentCountElement.textContent = '0 / 0';
+                                commentCountElement.classList.add('invisible');
+                            }
+                        }
+                    }
+                };
+                let resizeTimeout;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(checkOverflow, 150);
+                });
+                requestAnimationFrame(() => { setTimeout(checkOverflow, 50); }); 
+
+                showMoreBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    contentWrapper.classList.remove('post-content-collapsed');
+                    contentWrapper.classList.add('post-content-expanded');
+                    contentWrapper.style.maxHeight = `${contentWrapper.scrollHeight}px`; 
+                    showMoreBtn.classList.add('hidden');
+                    showLessBtn.classList.remove('hidden');
+                    showMoreBtn.setAttribute('aria-expanded', 'true');
+                    showLessBtn.setAttribute('aria-expanded', 'true');
+                    self.loadAndPrepareComments(postId); 
+                });
+
+                showLessBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    self.resetPostState(postId); 
+                    contentWrapper.style.maxHeight = `${Math.round(collapsedHeightThreshold)}px`;
+                    setTimeout(() => { contentWrapper.classList.add('post-content-collapsed'); }, 10); 
+                    contentWrapper.classList.remove('post-content-expanded');
+                    showLessBtn.classList.add('hidden');
+                    showMoreBtn.classList.remove('hidden');
+                    showMoreBtn.setAttribute('aria-expanded', 'false');
+                    showLessBtn.setAttribute('aria-expanded', 'false');
+                    postActionsDiv.classList.add('hidden'); 
+                    if(commentIconBtn) commentIconBtn.setAttribute('aria-expanded', 'false');
+                });
+
+                commentIconBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!postActionsDiv.classList.contains('hidden')) {
+                        const wasHidden = commentsContainer.classList.contains('hidden');
+                        commentsContainer.classList.toggle('hidden');
+                        commentIconBtn.setAttribute('aria-expanded', String(!wasHidden));
+                        if (!wasHidden) { 
+                            commentsContainer.classList.remove('comments-active');
+                        } else { 
+                            const totalCount = self.state.postCommentCounts[postId];
+                            if (totalCount !== undefined && totalCount > 0) {
+                                commentsContainer.classList.add('comments-active');
+                                commentsContainer.scrollTo({ top: 0, behavior: 'smooth' }); 
+                            } else {
+                                commentsContainer.classList.remove('comments-active');
+                                if (!commentsContainer.querySelector('.comment-thread') && !commentsContainer.querySelector('p')) {
+                                     if (totalCount === 0) {
+                                        commentsContainer.innerHTML = `<p class="text-sm text-gray-400 italic p-2">No comments generated for this post.</p>`;
+                                     } else { 
+                                        commentsContainer.innerHTML = `<p class="text-sm text-gray-400 italic p-2">Click 'Show more' on the post first to load comments.</p>`;
+                                     }
+                                }
+                            }
+                        }
+                    }
+                });
+            },
+
+            // Main initialization function for the app
+            init() {
+                const contentShownEvent = new Event('contentShown');
+                const disclaimerModal = document.getElementById('disclaimer-modal');
+                const yesBtn = document.getElementById('disclaimer-yes-btn');
+                const noBtn = document.getElementById('disclaimer-no-btn');
+
+                const showContent = () => {
+                    disclaimerModal?.classList.add('hidden');
+                    document.body.classList.remove('content-hidden');
+                    document.body.dispatchEvent(contentShownEvent); 
+                }
+
+                if (disclaimerModal && yesBtn && noBtn) {
+                    yesBtn.addEventListener('click', showContent);
+                    noBtn.addEventListener('click', () => {
+                        window.close();
+                        setTimeout(() => {
+                            console.log("Attempted to close the tab. If it didn't close, please close it manually.");
+                        }, 100);
+                    });
+                } else {
+                    showContent(); 
+                }
+
+                document.body.addEventListener('contentShown', () => {
+                    this.initializeViewCounters();
+                    this.initializeHeroAnimation();
+                    this.initializeIntroParagraphSplitting(); 
+                    this.initializeMenuAndScroll();
+                    this.setCopyrightYear();
+
+                    const postsLoadingMessage = document.getElementById('posts-loading-message');
+                    if (postsLoadingMessage) {
+                        postsLoadingMessage.textContent = 'Generating initial community update...';
+                    }
+
+                    if (!this.state.postGenerationTriggered) { 
+                        if (this.state.heroSubheadlinesList && this.state.heroSubheadlinesList.length > 0) {
+                            setTimeout(() => {
+                                this.generateSinglePost(true);
+                            }, 500); 
+                        } else {
+                            console.warn("Hero subheadlines list is empty at initial load. Cannot auto-generate first post.");
+                            if (postsLoadingMessage) { 
+                                postsLoadingMessage.textContent = 'No themes available for community updates at the moment.';
+                            }
+                             setTimeout(() => {
+                                this.generateSinglePost(true);
+                            }, 500);
+                        }
+                    }
+                }, { once: true });
+            }
+        };
+        // Initialize the main application
+        stimuliApp.init();
+    </script>
+
+    </body>
+</html>
